@@ -175,65 +175,63 @@ def decodeCMPSubblock(sbdata):
         j += 1
         
     return sb
+    
+def listCopy2d(inp, cop, x, y): 
+    ox = x
+    for row in cop:
+        for pix in row:
+            inp[y][x] = pix
+            x += 1
+        y += 1
+        x = ox
+    
+    return inp
 
 def decodeCMPBlock(bdata):
     #Decode the four subblocks that make up a CMP block
-    bm = [[], []]
+    bm = [[0 for i in range(8)] for j in range(8)]
     s = StringIO.StringIO(bdata)
-    bm[0].append(decodeCMPSubblock(s.read(8)))
-    bm[0].append(decodeCMPSubblock(s.read(8)))
-    bm[1].append(decodeCMPSubblock(s.read(8)))
-    bm[1].append(decodeCMPSubblock(s.read(8)))
+    bm = listCopy2d(bm, decodeCMPSubblock(s.read(8)), 0, 0)
+    bm = listCopy2d(bm, decodeCMPSubblock(s.read(8)), 4, 0)
+    bm = listCopy2d(bm, decodeCMPSubblock(s.read(8)), 0, 4)
+    bm = listCopy2d(bm, decodeCMPSubblock(s.read(8)), 4, 4)
     s.close()
     return bm
 
 def arrayToPixels(ar):
     #Convert the complicated block/subblock array into a linear set of pixels for bitmap
     ret = ''
-    blockwidth = len(ar[0])
-    phc = 0
-    j = len(ar) - 1
-    print str(j) + ' ' + str(blockwidth)
-    while j >= 0:
-        sbh = 1
-        while sbh >= 0:
-            ph = 3
-            while ph >= 0:
-                phc += 1
-                k = 0
-                while k < blockwidth:
-                    sbw = 0
-                    while sbw < 2:
-                        pw = 0
-                        while pw < 4:
-                            cpix = ar[j][k][sbh][sbw][ph][pw]
-                            px = padToTwo(hex(cpix['b'])[2:])
-                            px += padToTwo(hex(cpix['g'])[2:])
-                            px += padToTwo(hex(cpix['r'])[2:])
-                            ret += px
-                            pw += 1
-                        sbw += 1
-                    k += 1
-                ph -= 1
-            sbh -= 1
-        j -= 1
+    width = len(ar[0])
+    h = len(ar) - 1
+
+    while h >= 0:
+        w = 0
+        while w < width:
+            cpix = ar[h][w]
+            px = padToTwo(hex(cpix['b'])[2:])
+            px += padToTwo(hex(cpix['g'])[2:])
+            px += padToTwo(hex(cpix['r'])[2:])
+            ret += px
+            w += 1
+        h -= 1
 
     print len(ret)
     return bytearray.fromhex(ret)
 
 def decodeCMP(imdata, width, height):
     #Decode a CMP encoded image into bitmap
+    #TODO: seperate out into a module
     s = StringIO.StringIO(imdata)
+    bm = [[0 for w in range(width)] for h in range(height)]
     j = 0
-    bm = []
+    i = 0
 
     while j < height / 8:
-        bm.append([])
-        i = 0
         while i < width / 8:
-            bm[j].append(decodeCMPBlock(s.read(32)))
+            bm = listCopy2d(bm, decodeCMPBlock(s.read(32)), i * 8, j * 8)
             i += 1
         j += 1
+        i = 0
     
     s.close()
     bm = {'header': makeBitmapHeader(width, height, len(bm)), 'pixels': arrayToPixels(bm)}
