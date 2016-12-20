@@ -108,17 +108,15 @@ def makeBitmapHeader(width, height, size):
     return bytearray.fromhex(header)
 
 def c565to888(col):
-    #Convert RGB565 to RGB888 using lookup tables
+    #Convert RGB565 to RGB888
     if col == -1:
         return -1
 
-    table5 = [0, 8, 16, 25, 33, 41, 49, 58, 66, 74, 82, 90, 99, 107, 115, 123, 132, 140, 148, 156, 165, 173, 181, 189, 197, 206, 214, 222, 230, 239, 247, 255]
-    table6 = [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 45, 49, 53, 57, 61, 65, 69, 73, 77, 81, 85, 89, 93, 97, 101,  105, 109, 113, 117, 121, 125, 130, 134, 138, 142, 146, 150, 154, 158, 162, 166, 170, 174, 178, 182, 186, 190, 194, 198, 202, 206, 210, 215, 219, 223, 227, 231,  235, 239, 243, 247, 251, 255]
     ba = BitArray(uint=int(col), length=16)
     ret = {}
-    ret['r'] = table5[ba[:5].uint]
-    ret['g'] = table6[ba[5:11].uint]
-    ret['b'] = table5[ba[11:16].uint]
+    ret['r'] = int(round(float(ba[:5].uint) * (255 / float(32))))
+    ret['g'] = int(round(float(ba[5:11].uint) * (255 / float(64))))
+    ret['b'] = int(round(float(ba[11:16].uint) * (255 / float(32))))
     return ret
 
 def interpolateColours(one, two, amount):
