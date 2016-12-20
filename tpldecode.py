@@ -113,7 +113,7 @@ def c565to888(col):
     #Convert RGB565 to RGB888 using lookup tables
     if col == -1:
         return -1
-    
+
     table5 = [0, 8, 16, 25, 33, 41, 49,  58, 66, 74, 82, 90, 99, 107, 115, 123, 132, 140, 148, 156, 165, 173, 181, 189, 197, 206, 214, 222, 230, 239, 247, 255]
     table6 = [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 45, 49, 53, 57, 61, 65, 69, 73, 77, 81, 85, 89, 93, 97, 101,  105, 109, 113, 117, 121, 125, 130, 134, 138, 142, 146, 150, 154, 158, 162, 166, 170, 174, 178, 182, 186, 190, 194, 198, 202, 206, 210, 215, 219, 223, 227, 231,  235, 239, 243, 247, 251, 255]
     ba = BitArray(uint=int(col), length=16)
@@ -123,40 +123,37 @@ def c565to888(col):
     ret['b'] = table5[ba[11:16].uint]
     return ret
 
+def interpolateColours(one, two, amount):
+    #Interpolate between two RGB888 colours
+    cdiffr = one['r'] - two['r']
+    cdiffg = one['g'] - two['g']
+    cdiffb = one['b'] - two['b']
+    cthr = int(one['r'] - (cdiffr * amount))
+    cthg = int(one['g'] - (cdiffg * amount))
+    cthb = int(one['b'] - (cdiffb * amount))
+    return {'r': cthr, 'g': cthg, 'b': cthg}
+
+def interpolate565Colours(one, two, amount):
+    #Interpolate between two RGB565 colours
+    return interpolateColours(c565to888(one), c565to888(two), amount)
+
 def decodeCMPPalette(pdata):
     #Decode the 2 byte pallette data for a CMP subblock and interpolate the additional colours
-    #TODO: find a better way to interpolate - check accuracy
+    #TODO: check interpolation accuracy
     cone = hexDec(pdata[:2])
     ctwo = hexDec(pdata[-2:])
     cthree = 0
     cfour = 0
 
     if cone > ctwo:
-        cone = c565to888(cone)
-        ctwo = c565to888(ctwo)
-        cdiffr = cone['r'] - ctwo['r']
-        cdiffg = cone['g'] - ctwo['g']
-        cdiffb = cone['b'] - ctwo['b']
-        cthreer = int(cone['r'] - (cdiffr / 3))
-        cthreeg = int(cone['g'] - (cdiffg / 3))
-        cthreeb = int(cone['b'] - (cdiffb / 3))
-        cfourr = int(cone['r'] - ((cdiffr / 3) * 2))
-        cfourg = int(cone['g'] - ((cdiffg / 3) * 2))
-        cfourb = int(cone['b'] - ((cdiffb / 3) * 2))
-        cthree = {'r': cthreer, 'g': cthreeg, 'b': cthreeb}
-        cfour = {'r': cfourr, 'g': cfourg, 'b': cfourb}
+        cthree = interpolate565Colours(cone, ctwo, 1/3)
+        cfour = interpolate565Colours(cone, ctwo, 2/3)
     else:
-        cone = c565to888(cone)
-        ctwo = c565to888(ctwo)
-        cdiffr = ctwo['r'] - cone['r']
-        cdiffg = ctwo['g'] - cone['g']
-        cdiffb = ctwo['b'] - cone['b']
-        cthreer = int(cone['r'] + (cdiffr / 2))
-        cthreeg = int(cone['g'] + (cdiffg / 2))
-        cthreeb = int(cone['b'] + (cdiffb / 2))
-        cthree = {'r': cthreer, 'g': cthreeg, 'b': cthreeb}
+        cthree = interpolate565Colours(cone, ctwo, 1/2)
         cfour = -1
-
+    
+    cone = c565to888(cone)
+    ctwo = c565to888(ctwo)
     ret = {0: cone, 1: ctwo, 2: cthree, 3: cfour}
     return ret        
 
@@ -246,8 +243,7 @@ def decodeCMP(imdata, width, height):
     bm = {'header': makeBitmapHeader(width, height, len(bm)), 'pixels': arrayToPixels(bm)}
     return bm
 
-#file = raw_input('file: ')
-file = 'C:/mariost.tpl'
+file = raw_input('file: ')
 f = open(file, 'rb')
 
 try:
@@ -274,7 +270,7 @@ try:
                 f.seek(imheader['offset'])
                 imdata = f.read(imheader['size'])
                 bitmap = decodeCMP(imdata, imheader['width'], imheader['height'])
-                bm = open('C:/Python27/mariost/' + str(i) + '.bmp', 'wb')
+                bm = open('C:/output/' + str(i) + '.bmp', 'wb')
                 bm.write(bitmap['header'])
                 bm.write(bitmap['pixels'])
                 bm.close()
