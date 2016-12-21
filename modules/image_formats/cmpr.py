@@ -1,25 +1,15 @@
-import StringIO
 import struct
 from bitstring import BitArray
 from imageformat import ImageFormat
 
-class CMPR(ImageFormat):        
-    def loadImage(self, data):
-        self.createImageArray(self.width, self.height)
-        self.decodeCMPR(data)
+class CMPR(ImageFormat):    
+    def __init__(self, data, width, height):
+        self.blockWidth = 8
+        self.blockHeight = 8
+        self.blockSize = 32
+        ImageFormat.__init__(self, data, width, height)
         
-    def decodeCMPR(self, data):
-        s = StringIO.StringIO(data)
-    
-        for j in range(0, self.height/8):
-            for i in range(0, self.width/8):
-                block = s.read(32)
-                decodedBlock = self.decodeCMPRBlock(block)
-                self.imageArray = self.listCopy2d(self.imageArray, decodedBlock, i*8, j*8)
-        
-        s.close()
-        
-    def decodeCMPRBlock(self, block):
+    def decodeBlock(self, block):
         bm = [[0 for i in range(8)] for j in range(8)]
         bm = self.listCopy2d(bm, self.decodeCMPRSubblock(block[:8]), 0, 0)
         bm = self.listCopy2d(bm, self.decodeCMPRSubblock(block[8:16]), 4, 0)

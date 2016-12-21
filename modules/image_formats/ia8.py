@@ -3,22 +3,13 @@ import struct
 from imageformat import ImageFormat
 
 class IA8(ImageFormat):
-    def loadImage(self, data):
-        self.createImageArray(self.width, self.height)
-        self.decodeIA8(data)
+    def __init__(self, data, width, height):
+        self.blockWidth = 4
+        self.blockHeight = 4
+        self.blockSize = 32
+        ImageFormat.__init__(self, data, width, height)
         
-    def decodeIA8(self, data):
-        s = StringIO.StringIO(data)
-    
-        for j in range(0, self.height/8):
-            for i in range(0, self.width/8):
-                block = s.read(32)
-                decodedBlock = self.decodeIA8Block(block)
-                self.imageArray = self.listCopy2d(self.imageArray, decodedBlock, i*8, j*8)
-        
-        s.close()
-        
-    def decodeIA8Block(self, block):
+    def decodeBlock(self, block):
         bl = []
         s = StringIO.StringIO(block)
         

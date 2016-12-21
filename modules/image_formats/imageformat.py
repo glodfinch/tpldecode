@@ -1,8 +1,25 @@
+import StringIO
+
 class ImageFormat:
     def __init__(self, data, width, height):
         self.width = width
         self.height = height
         self.loadImage(data)
+        
+    def loadImage(self, data):
+        self.createImageArray(self.width, self.height)
+        self.decodeBlocks(data)
+        
+    def decodeBlocks(self, data):
+        s = StringIO.StringIO(data)
+    
+        for j in range(0, self.height/self.blockHeight):
+            for i in range(0, self.width/self.blockWidth):
+                block = s.read(self.blockSize)
+                decodedBlock = self.decodeBlock(block)
+                self.imageArray = self.listCopy2d(self.imageArray, decodedBlock, i*self.blockHeight, j*self.blockWidth)
+        
+        s.close()
         
     def createImageArray(self, width, height):
         self.imageArray = [[0 for i in range(width)] for j in range(height)]
