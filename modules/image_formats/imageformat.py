@@ -1,4 +1,9 @@
 class ImageFormat:
+    def __init__(self, data, width, height):
+        self.width = width
+        self.height = height
+        self.loadImage(data)
+        
     def createImageArray(self, width, height):
         self.imageArray = [[0 for i in range(width)] for j in range(height)]
                             

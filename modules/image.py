@@ -1,7 +1,7 @@
 import struct
-import pprint
 import PIL
 from image_formats.cmpr import CMPR
+from image_formats.ia8 import IA8
 
 class Image:
     def __init__(self, header=False, data=False):
@@ -17,6 +17,8 @@ class Image:
     def loadImage(self, data):
         if self.format == 'CMPR':
             self.image = CMPR(data, self.width, self.height)
+        if self.format == 'IA8':
+            self.image = IA8(data, self.width, self.height)
             
     def saveImage(self, filename):
         img = PIL.Image.new('RGBA', (self.width, self.height))
@@ -25,7 +27,6 @@ class Image:
         
     def decodeFormat(self, fmat):
         fmat = struct.unpack('>I', fmat)[0]
-        print str(fmat) + '!'
         
         if fmat == 0:
             return 'I4'

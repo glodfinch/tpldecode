@@ -3,12 +3,7 @@ import struct
 from bitstring import BitArray
 from imageformat import ImageFormat
 
-class CMPR(ImageFormat):
-    def __init__(self, data, width, height):
-        self.width = width
-        self.height = height
-        self.loadImage(data)
-        
+class CMPR(ImageFormat):        
     def loadImage(self, data):
         self.createImageArray(self.width, self.height)
         self.decodeCMPR(data)
