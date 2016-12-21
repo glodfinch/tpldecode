@@ -38,7 +38,7 @@ try:
             image = Image(imheader)
             print str(i) + ': ' + image.format + ' ' + str(image.size) + ' bytes'
 
-            if image.format == 'CMPR' or image.format == 'IA8':
+            if image.size != 0:
                 f.seek(image.offset)
                 imdata = f.read(image.size)
                 image.loadImage(imdata)
