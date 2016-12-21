@@ -22,11 +22,11 @@ class RGB5A3(ImageFormat):
 
                 if alphaFlag == 1:
                     a = 255
-                    r = pix[1:6].uint * 8
-                    g = pix[6:11].uint * 8
-                    b = pix[11:16].uint * 8
+                    r = self.colourScale(pix[1:6].uint, 32)
+                    g = self.colourScale(pix[6:11].uint, 32)
+                    b = self.colourScale(pix[11:16].uint, 32)
                 else:
-                    a = pix[1:4].uint * 32
+                    a = self.colourScale(pix[1:4].uint, 8)
                     r = pix[4:8].uint * 17
                     g = pix[8:12].uint * 17
                     b = pix[12:16].uint * 17

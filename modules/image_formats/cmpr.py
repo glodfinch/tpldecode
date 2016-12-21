@@ -7,6 +7,7 @@ class CMPR(ImageFormat):
         self.blockWidth = 8
         self.blockHeight = 8
         self.blockSize = 32
+        self.bitsPerPixel = 4
         ImageFormat.__init__(self, data, width, height)
         
     def decodeBlock(self, block):
