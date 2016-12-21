@@ -5,6 +5,7 @@ from image_formats.ia8 import IA8
 from image_formats.rgb5a3 import RGB5A3
 from image_formats.rgb565 import RGB565
 from image_formats.i4 import I4
+from image_formats.rgba8 import RGBA8
 
 class Image:
     def __init__(self, header=False, data=False):
@@ -30,6 +31,9 @@ class Image:
             self.image = RGB565(data, self.width, self.height)
         if self.format == 'I4':
             self.image = I4(data, self.width, self.height)
+        if self.format == 'RGBA8':
+            self.image = RGBA8(data, self.width, self.height)
+        
             
     def saveImage(self, filename):
         img = PIL.Image.new('RGBA', (self.width, self.height))
@@ -56,6 +60,7 @@ class Image:
             self.size = self.height * self.width * 2
             return 'RGB5A3'
         if fmat == 6:
+            self.size = self.height * self.width * 4
             return 'RGBA8'
         if fmat == 8:
             return 'CI4'
