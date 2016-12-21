@@ -75,7 +75,7 @@ class CMPR(ImageFormat):
             return -1
     
         ba = BitArray(uint=int(col), length=16)
-        r = int(round(float(ba[:5].uint) * (255 / float(32))))
-        g = int(round(float(ba[5:11].uint) * (255 / float(64))))
-        b = int(round(float(ba[11:16].uint) * (255 / float(32))))
+        r = self.colourScale(ba[:5].uint, 32)
+        g = self.colourScale(ba[5:11].uint, 64)
+        b = self.colourScale(ba[11:16].uint, 32)
         return (r, g, b, 255)

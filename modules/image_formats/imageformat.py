@@ -37,3 +37,6 @@ class ImageFormat:
         
     def getPixels(self):
         return [x for sublist in self.imageArray for x in sublist]
+
+    def colourScale(self, col, size):
+        return int(round(float(col) * (255 / float(size))))
