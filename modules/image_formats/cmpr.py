@@ -82,7 +82,7 @@ class CMPR(ImageFormat):
         cthr = int(float(one[0]) - (cdiffr * amount))
         cthg = int(float(one[1]) - (cdiffg * amount))
         cthb = int(float(one[2]) - (cdiffb * amount))
-        return (cthr, cthg, cthb, 1)
+        return (cthr, cthg, cthb, 255)
         
     def c565to888(self, col):
         #Convert RGB565 to RGB888
@@ -93,4 +93,4 @@ class CMPR(ImageFormat):
         r = int(round(float(ba[:5].uint) * (255 / float(32))))
         g = int(round(float(ba[5:11].uint) * (255 / float(64))))
         b = int(round(float(ba[11:16].uint) * (255 / float(32))))
-        return (r, g, b, 1)
+        return (r, g, b, 255)

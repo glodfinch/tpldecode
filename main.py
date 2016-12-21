@@ -1,4 +1,3 @@
-import pprint
 from modules.image import Image
 
 def stoi(s):
@@ -58,36 +57,6 @@ def padToTwo(s):
 
     return s
 
-def makeBitmapHeader(width, height, size):
-    #Create a valid header for a bitmap file using width, height, and 
-    #file size of pixels
-    width = padToEight(iToBE(width))
-    height = padToEight(iToBE(height))
-    sizeraw = padToEight(iToBE(size))
-    size = padToEight(iToBE(size + 54))
-    header = '424D' + size + '000000003600000028000000' + width + height + '0100180000000000' + sizeraw + '130B0000130B00000000000000000000'
-    return bytearray.fromhex(header)    
-
-def arrayToPixels(ar):
-    #Convert a pixel array into a linear set of pixels for bitmap
-    ret = ''
-    width = len(ar[0])
-    h = len(ar) - 1
-
-    while h >= 0:
-        w = 0
-        while w < width:
-            cpix = ar[h][w]
-            px = padToTwo(hex(cpix[2])[2:])
-            px += padToTwo(hex(cpix[1])[2:])
-            px += padToTwo(hex(cpix[0])[2:])
-            ret += px
-            w += 1
-        h -= 1
-
-    print len(ret)
-    return bytearray.fromhex(ret)
-
 file = raw_input('file: ')
 f = open(file, 'rb')
 
@@ -100,7 +69,7 @@ try:
         itoff = hexDec(f.read(4))
         print 'Image offset table byte: ' + str(itoff)
         f.seek(itoff)
-        i = 0
+        
         for i in range(0, count):
             imoff = hexDec(f.read(4))
             paoff = hexDec(f.read(4))
@@ -108,18 +77,13 @@ try:
             f.seek(imoff)
             imheader = f.read(35)
             image = Image(imheader)
-            print image.format
-            #TODO: support more image formats
+            print str(i) + ': ' + image.format
+
             if image.format == 'CMPR':
                 f.seek(image.offset)
                 imdata = f.read(image.size)
                 image.loadImage(imdata)
-                bitmapPixels = arrayToPixels(image.getPixelArray())
-                bitmapHeader = makeBitmapHeader(image.width, image.height, image.size)
-                bm = open('C:/output/' + str(i) + '.bmp', 'wb')
-                bm.write(bitmapHeader)
-                bm.write(bitmapPixels)
-                bm.close()
+                image.saveImage('C:/output/' + str(i) + '.png')
         
             f.seek(cuoff)          
 finally:

@@ -1,4 +1,6 @@
 import struct
+import pprint
+import PIL
 from image_formats.cmpr import CMPR
 
 class Image:
@@ -16,8 +18,10 @@ class Image:
         if self.format == 'CMPR':
             self.image = CMPR(data, self.width, self.height)
             
-    def getPixelArray(self):
-        return self.image.imageArray
+    def saveImage(self, filename):
+        img = PIL.Image.new('RGBA', (self.width, self.height))
+        img.putdata(self.image.getPixels())
+        img.save(filename)
         
     def decodeFormat(self, fmat):
         fmat = struct.unpack('>I', fmat)[0]

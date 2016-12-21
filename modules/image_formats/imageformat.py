@@ -13,5 +13,8 @@ class ImageFormat:
         
         return inp
         
-    def flatten(listOfLists):
+    def getPixels(self):
+        return [x for sublist in self.imageArray for x in sublist]
+        
+    def flatten(self, listOfLists):
         return chain.from_iterable(listOfLists)
