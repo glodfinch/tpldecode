@@ -78,9 +78,9 @@ def arrayToPixels(ar):
         w = 0
         while w < width:
             cpix = ar[h][w]
-            px = padToTwo(hex(cpix['b'])[2:])
-            px += padToTwo(hex(cpix['g'])[2:])
-            px += padToTwo(hex(cpix['r'])[2:])
+            px = padToTwo(hex(cpix[2])[2:])
+            px += padToTwo(hex(cpix[1])[2:])
+            px += padToTwo(hex(cpix[0])[2:])
             ret += px
             w += 1
         h -= 1

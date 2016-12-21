@@ -43,10 +43,7 @@ class CMPR(ImageFormat):
             sb.append([])
             for i in range(0, 4):
                 c = pix[k * 2:(k + 1) * 2].uint
-                if pall[c] != -1:
-                    sb[j].append(pall[c])
-                else:
-                    sb[j].append({'r': 0, 'g': 0, 'b': 0})
+                sb[j].append(pall[c])
                 k += 1
             
         return sb
@@ -64,7 +61,7 @@ class CMPR(ImageFormat):
             cfour = self.interpolate565Colours(cone, ctwo, 2/float(3))
         else:
             cthree = self.interpolate565Colours(cone, ctwo, 0.5)
-            cfour = -1
+            cfour = (0, 0, 0, 0)
         
         cone = self.c565to888(cone)
         ctwo = self.c565to888(ctwo)
@@ -79,13 +76,13 @@ class CMPR(ImageFormat):
 
     def interpolateColours(self, one, two, amount):
         #Interpolate between two RGB888 colours
-        cdiffr = one['r'] - two['r']
-        cdiffg = one['g'] - two['g']
-        cdiffb = one['b'] - two['b']
-        cthr = int(float(one['r']) - (cdiffr * amount))
-        cthg = int(float(one['g']) - (cdiffg * amount))
-        cthb = int(float(one['b']) - (cdiffb * amount))
-        return {'r': cthr, 'g': cthg, 'b': cthb}
+        cdiffr = one[0] - two[0]
+        cdiffg = one[1] - two[1]
+        cdiffb = one[2] - two[2]
+        cthr = int(float(one[0]) - (cdiffr * amount))
+        cthg = int(float(one[1]) - (cdiffg * amount))
+        cthb = int(float(one[2]) - (cdiffb * amount))
+        return (cthr, cthg, cthb, 1)
         
     def c565to888(self, col):
         #Convert RGB565 to RGB888
@@ -93,8 +90,7 @@ class CMPR(ImageFormat):
             return -1
     
         ba = BitArray(uint=int(col), length=16)
-        ret = {}
-        ret['r'] = int(round(float(ba[:5].uint) * (255 / float(32))))
-        ret['g'] = int(round(float(ba[5:11].uint) * (255 / float(64))))
-        ret['b'] = int(round(float(ba[11:16].uint) * (255 / float(32))))
-        return ret
+        r = int(round(float(ba[:5].uint) * (255 / float(32))))
+        g = int(round(float(ba[5:11].uint) * (255 / float(64))))
+        b = int(round(float(ba[11:16].uint) * (255 / float(32))))
+        return (r, g, b, 1)

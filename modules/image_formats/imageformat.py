@@ -12,3 +12,6 @@ class ImageFormat:
             x = ox
         
         return inp
+        
+    def flatten(listOfLists):
+        return chain.from_iterable(listOfLists)
