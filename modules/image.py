@@ -5,6 +5,8 @@ from image_formats.ia8 import IA8
 
 class Image:
     def __init__(self, header=False, data=False):
+        self.size = 0
+        
         if header != False: 
             self.loadHeader(header)
         if data != False: 
@@ -35,6 +37,7 @@ class Image:
         if fmat == 2:
             return 'IA4'
         if fmat == 3:
+            self.size = self.height * self.width * 2
             return 'IA8'
         if fmat == 4:
             return 'RGB565'
@@ -49,6 +52,7 @@ class Image:
         if fmat == 10:
             return 'CI14X2'
         if fmat == 14:
+            self.size = (self.height * self.width) / 2
             return 'CMPR'
         
         return False
@@ -58,4 +62,3 @@ class Image:
         self.width = struct.unpack('>H', data[2:4])[0]
         self.format = self.decodeFormat(data[4:8])
         self.offset = struct.unpack('>I', data[8:12])[0]
-        self.size = (self.height * self.width) / 2

@@ -36,7 +36,7 @@ try:
             f.seek(imoff)
             imheader = f.read(35)
             image = Image(imheader)
-            print str(i) + ': ' + image.format
+            print str(i) + ': ' + image.format + ' ' + str(image.size) + ' bytes'
 
             if image.format == 'CMPR' or image.format == 'IA8':
                 f.seek(image.offset)
